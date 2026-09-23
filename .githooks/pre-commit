@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+cd "$root"
+
+"$root/scripts/leakcheck.sh"
+
+staged_go="$(git diff --cached --name-only --diff-filter=ACMR -- '*.go')"
+[ -z "$staged_go" ] && exit 0
+
+unformatted="$(echo "$staged_go" | xargs gofmt -l)"
+if [ -n "$unformatted" ]; then
+  echo "gofmt needed:" >&2
+  echo "$unformatted" >&2
+  exit 1
+fi
+
+echo "$staged_go" | xargs go run ./internal/tools/nocomments

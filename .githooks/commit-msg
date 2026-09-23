@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+"$root/scripts/leakcheck.sh" message "$1"
+
+pattern='^(feat|fix|docs|test|refactor|perf|build|ci|chore|revert)(\([a-z0-9./-]+\))?!?: .+'
+if ! head -1 "$1" | grep -Eq "$pattern"; then
+  echo "commit-msg: use Conventional Commits, e.g. feat(tool): add registry" >&2
+  exit 1
+fi
