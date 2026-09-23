@@ -38,7 +38,8 @@ func TestCollectText(t *testing.T) {
 	resp, err := provider.Collect(events(
 		provider.Event{Type: provider.EventTextDelta, Delta: "Hel"},
 		provider.Event{Type: provider.EventTextDelta, Delta: "lo"},
-		provider.Event{Type: provider.EventReasoningDelta, Delta: "thinking"},
+		provider.Event{Type: provider.EventReasoningDelta, Delta: "think"},
+		provider.Event{Type: provider.EventReasoningDelta, Delta: "ing"},
 		provider.Event{Type: provider.EventCompleted, FinishReason: provider.FinishStop, Model: "m-1", RequestID: "req-1"},
 	))
 	if err != nil {
@@ -46,7 +47,7 @@ func TestCollectText(t *testing.T) {
 	}
 
 	want := provider.Response{
-		Message:      message.Assistant("Hello"),
+		Message:      message.New(message.RoleAssistant, message.Text{Text: "Hello"}, message.Reasoning{Text: "thinking"}),
 		FinishReason: provider.FinishStop,
 		Model:        "m-1",
 		RequestID:    "req-1",

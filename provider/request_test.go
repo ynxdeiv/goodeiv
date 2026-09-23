@@ -88,6 +88,12 @@ func TestRequestValidate(t *testing.T) {
 	}
 }
 
+func forced(choice provider.ToolChoice) provider.Request {
+	req := validRequest()
+	req.ToolChoice = choice
+	return req
+}
+
 func TestCapabilitiesSupports(t *testing.T) {
 	image := message.New(message.RoleUser, message.Image{MediaType: "image/png", URL: "https://x/y.png"})
 	file := message.New(message.RoleUser, message.File{MediaType: "application/pdf", URL: "https://x/y.pdf"})
@@ -105,6 +111,10 @@ func TestCapabilitiesSupports(t *testing.T) {
 		{"images supported", provider.Capabilities{Vision: true}, provider.Request{Messages: []message.Message{image}}, false},
 		{"files need file support", provider.Capabilities{Vision: true}, provider.Request{Messages: []message.Message{file}}, true},
 		{"files supported", provider.Capabilities{Files: true}, provider.Request{Messages: []message.Message{file}}, false},
+		{"required choice needs forced tool choice", provider.Capabilities{Tools: true}, forced(provider.ToolChoice{Mode: provider.ToolChoiceRequired}), true},
+		{"named choice needs forced tool choice", provider.Capabilities{Tools: true}, forced(provider.ToolChoice{Mode: provider.ToolChoiceTool, Name: "weather.current"}), true},
+		{"forced tool choice supported", provider.Capabilities{Tools: true, ForcedToolChoice: true}, forced(provider.ToolChoice{Mode: provider.ToolChoiceRequired}), false},
+		{"none choice needs nothing extra", provider.Capabilities{Tools: true}, forced(provider.ToolChoice{Mode: provider.ToolChoiceNone}), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

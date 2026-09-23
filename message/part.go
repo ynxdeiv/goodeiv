@@ -6,7 +6,7 @@ import (
 )
 
 // Part is a piece of message content. The set of implementations is closed:
-// Text, Image, File, ToolCall and ToolResult.
+// Text, Reasoning, Image, File, ToolCall and ToolResult.
 type Part interface {
 	partType() partType
 }
@@ -15,6 +15,7 @@ type partType string
 
 const (
 	partText       partType = "text"
+	partReasoning  partType = "reasoning"
 	partImage      partType = "image"
 	partFile       partType = "file"
 	partToolCall   partType = "tool_call"
@@ -24,6 +25,13 @@ const (
 // Text is plain text content.
 type Text struct {
 	// Text is the content.
+	Text string
+}
+
+// Reasoning is the model's visible reasoning. Some providers require it to be sent back in
+// later requests, so it is kept in the conversation instead of being discarded.
+type Reasoning struct {
+	// Text is the reasoning content.
 	Text string
 }
 
@@ -74,6 +82,7 @@ type ToolResult struct {
 }
 
 func (Text) partType() partType       { return partText }
+func (Reasoning) partType() partType  { return partReasoning }
 func (Image) partType() partType      { return partImage }
 func (File) partType() partType       { return partFile }
 func (ToolCall) partType() partType   { return partToolCall }

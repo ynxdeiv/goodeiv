@@ -59,7 +59,8 @@ const (
 
 // Event is one normalized stream event. Which fields are set depends on Type:
 //
-//   - EventTextDelta, EventReasoningDelta: Delta.
+//   - EventTextDelta, EventReasoningDelta: Delta. Consecutive deltas are merged into one
+//     message.Text or message.Reasoning part.
 //   - EventToolCallStarted: ToolCall.ID and ToolCall.Name.
 //   - EventToolCallDelta: ToolCall.ID and an argument fragment in Delta.
 //   - EventToolCallCompleted: the full ToolCall. Every started call must complete.
@@ -111,8 +112,10 @@ func (c *collector) add(ev Event) error {
 	}
 	switch ev.Type {
 	case EventTextDelta:
-		c.appendText(ev.Delta)
-	case EventReasoningDelta, EventToolCallDelta:
+		c.parts = appendDelta(c.parts, ev.Delta, func(text string) message.Part { return message.Text{Text: text} })
+	case EventReasoningDelta:
+		c.parts = appendDelta(c.parts, ev.Delta, func(text string) message.Part { return message.Reasoning{Text: text} })
+	case EventToolCallDelta:
 	case EventToolCallStarted:
 		if c.pending == nil {
 			c.pending = map[string]bool{}
@@ -134,14 +137,26 @@ func (c *collector) add(ev Event) error {
 	return nil
 }
 
-func (c *collector) appendText(delta string) {
-	if n := len(c.parts); n > 0 {
-		if last, ok := c.parts[n-1].(message.Text); ok {
-			c.parts[n-1] = message.Text{Text: last.Text + delta}
-			return
+func appendDelta(parts []message.Part, delta string, build func(string) message.Part) []message.Part {
+	if delta == "" {
+		return parts
+	}
+	next := build(delta)
+	if n := len(parts); n > 0 {
+		switch last := parts[n-1].(type) {
+		case message.Text:
+			if _, same := next.(message.Text); same {
+				parts[n-1] = message.Text{Text: last.Text + delta}
+				return parts
+			}
+		case message.Reasoning:
+			if _, same := next.(message.Reasoning); same {
+				parts[n-1] = message.Reasoning{Text: last.Text + delta}
+				return parts
+			}
 		}
 	}
-	c.parts = append(c.parts, message.Text{Text: delta})
+	return append(parts, next)
 }
 
 func (c *collector) response() (Response, error) {

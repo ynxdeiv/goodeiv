@@ -34,7 +34,7 @@ See [ADR 0001](adr/0001-module-boundaries.md).
 | Package | Contents |
 |---|---|
 | `fault` | Error taxonomy (`Kind`, `*Error`, `KindOf`, `IsRetryable`, `RetryAfter`) — see [errors.md](errors.md) |
-| `message` | `Role`, `Message` and the closed set of parts: `Text`, `Image`, `File`, `ToolCall`, `ToolResult`; `Trust` marker; validation and JSON |
+| `message` | `Role`, `Message` and the closed set of parts: `Text`, `Reasoning`, `Image`, `File`, `ToolCall`, `ToolResult`; `Trust` marker; validation and JSON |
 | `usage` | `Count` (known vs. unreported) and `Usage` with aggregation |
 
 `message` depends on `fault`; `usage` and `fault` depend only on the standard library.
@@ -42,7 +42,8 @@ See [ADR 0001](adr/0001-module-boundaries.md).
 ## Providers
 
 `provider` holds the contract, `Request`/`Response`, stream events, `Collect` and the `Registry`;
-`provider/providertest` holds the scripted fake. Vendor adapters live in `provider/<name>`.
+`provider/providertest` holds the scripted fake. Vendor adapters live in `provider/<name>`;
+adapters for Chat Completions-compatible APIs share `internal/chatcompletions`.
 See [providers.md](providers.md).
 
 ## Core contracts (detailed per phase)

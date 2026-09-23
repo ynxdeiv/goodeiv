@@ -1,7 +1,7 @@
 GO ?= go
 PKGS := ./...
 
-.PHONY: setup check fmt fmt-check vet lint test race cover nocomments leakcheck tidy
+.PHONY: setup check fmt fmt-check vet lint test race cover nocomments leakcheck tidy live
 
 setup:
 	git config core.hooksPath .githooks
@@ -40,3 +40,6 @@ leakcheck:
 
 tidy:
 	$(GO) mod tidy
+
+live:
+	@set -a; [ -f .env ] && . ./.env; set +a; $(GO) test -tags live -count=1 -v -run Live $(PKGS)

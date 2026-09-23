@@ -62,6 +62,8 @@ func encodePart(part Part) (jsonPart, error) {
 	switch p := part.(type) {
 	case Text:
 		return jsonPart{Type: partText, Text: p.Text}, nil
+	case Reasoning:
+		return jsonPart{Type: partReasoning, Text: p.Text}, nil
 	case Image:
 		return jsonPart{Type: partImage, MediaType: p.MediaType, Data: p.Data, URL: p.URL}, nil
 	case File:
@@ -79,6 +81,8 @@ func decodePart(p jsonPart) (Part, error) {
 	switch p.Type {
 	case partText:
 		return Text{Text: p.Text}, nil
+	case partReasoning:
+		return Reasoning{Text: p.Text}, nil
 	case partImage:
 		return Image{MediaType: p.MediaType, Data: p.Data, URL: p.URL}, nil
 	case partFile:

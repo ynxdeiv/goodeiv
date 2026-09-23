@@ -10,7 +10,7 @@ import (
 var allowedParts = map[Role]map[partType]bool{
 	RoleSystem:    {partText: true},
 	RoleUser:      {partText: true, partImage: true, partFile: true},
-	RoleAssistant: {partText: true, partToolCall: true},
+	RoleAssistant: {partText: true, partReasoning: true, partToolCall: true},
 	RoleTool:      {partToolResult: true},
 }
 
@@ -42,6 +42,10 @@ func validatePart(part Part) error {
 	case Text:
 		if p.Text == "" {
 			return fmt.Errorf("text is empty")
+		}
+	case Reasoning:
+		if p.Text == "" {
+			return fmt.Errorf("reasoning is empty")
 		}
 	case Image:
 		return validateSource(p.MediaType, p.Data, p.URL)

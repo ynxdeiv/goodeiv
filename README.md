@@ -51,7 +51,7 @@ dependencies, no global state, no reflection-based magic and no vendor lock-in.
 
 | | |
 |---|---|
-| 🔌 **Provider-agnostic** | One normalized request/response model. Adapters for OpenAI, Anthropic, Gemini and more. Vendor types never leak into your code. |
+| 🔌 **Provider-agnostic** | One normalized request/response model. DeepSeek today; OpenAI, Anthropic, Gemini and more on the way. Vendor types never leak into your code. |
 | 🧰 **Tools** | Small tool contract, concurrency-safe registry, validation and a staged execution pipeline. |
 | 🔁 **Bounded agent loop** | Hard limits on steps, tool calls, tokens and duration. An infinite loop is impossible by construction. |
 | ✋ **Human-in-the-loop** | Risky actions are persisted and approved **before** execution, then revalidated. Rejection means the action never runs. |
@@ -105,7 +105,8 @@ go get github.com/ynxdeiv/goodeiv
 
 ```go
 providers := provider.NewRegistry()
-providers.Register("openai", openai.New(openai.Config{APIKey: os.Getenv("OPENAI_API_KEY")}))
+ds, err := deepseek.New(deepseek.Config{APIKey: os.Getenv("DEEPSEEK_API_KEY")})
+providers.Register("deepseek", ds)
 ```
 
 ### Define a tool
@@ -147,7 +148,7 @@ rt := runtime.New(runtime.Config{
 result, err := rt.Run(ctx, runtime.RunRequest{
 	Agent: agent.Agent{
 		Name:  "assistant",
-		Model: model.Model{Provider: "openai", Name: "gpt-5"},
+		Model: model.Model{Provider: "deepseek", Name: "deepseek-v4-pro"},
 		Tools: []string{"weather.current"},
 		Limits: agent.Limits{MaxSteps: 8, MaxToolCalls: 16},
 	},
@@ -213,12 +214,12 @@ Read more in [docs/architecture.md](docs/architecture.md) and the [ADRs](docs/ad
 | Repository foundation, tooling, CI | ✅ done |
 | Core types and error taxonomy | ✅ done |
 | Provider contract + fake provider | ✅ done |
-| OpenAI adapter | ⏳ next |
+| DeepSeek adapter | ✅ done |
 | Tools, registry and agent loop | 🗓 planned |
 | Retry and fallback | 🗓 planned |
 | References, HITL and policies | 🗓 planned |
 | Observability and structured output | 🗓 planned |
-| Anthropic, Gemini and more providers | 🗓 planned |
+| OpenAI, Anthropic, Gemini and more providers | 🗓 planned |
 | First integration module (Google) | 🗓 planned |
 
 Full breakdown in [docs/roadmap.md](docs/roadmap.md).

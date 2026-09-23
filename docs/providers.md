@@ -87,8 +87,45 @@ Turns: `Reply`, `CallTools`, `Fail`, `Interrupt` (partial output, then an error)
 
 ## Adapters
 
-| Adapter | Status |
-|---|---|
-| `providertest` | ✅ available |
-| OpenAI | ⏳ next (phase 03) |
-| Anthropic, Gemini and others | 🗓 planned |
+| Adapter | Package | Status |
+|---|---|---|
+| Fake (tests) | `provider/providertest` | ✅ available |
+| DeepSeek | `provider/deepseek` | ✅ available |
+| OpenAI, Anthropic, Gemini and others | — | 🗓 planned |
+
+### DeepSeek
+
+```go
+p, err := deepseek.New(deepseek.Config{APIKey: os.Getenv("DEEPSEEK_API_KEY")})
+resp, err := p.Generate(ctx, provider.Request{Model: model, Messages: msgs})
+```
+
+- Models (verified live on 2026-09-23): `deepseek-flash` and `deepseek-v4-pro`.
+- Text-only thinking models: `Capabilities` reports tools, parallel tool calls, reasoning and
+  prompt caching — no vision, files, schema-constrained output or forced tool choice.
+- Thinking mode rejects `tool_choice` `required` or a named tool with HTTP 400, even though the
+  API reference lists them; `auto` and `none` work. goodeiv rejects forced choices before sending.
+- Reasoning arrives as `message.Reasoning` parts. When a request has tools, DeepSeek requires the
+  reasoning of earlier assistant turns to be sent back; the adapter does it as long as you keep the
+  assistant messages you received in the conversation.
+- Tool names such as `gmail.search` are sent as `gmail_search` and mapped back transparently. Two
+  tools that map to the same wire name are rejected before any request is made.
+- HTTP 402 (no balance) is `quota_exhausted`, 429 is `rate_limited` with `Retry-After`, 503 is
+  `provider_unavailable`, and `insufficient_system_resource` mid-generation is `provider_unavailable`.
+
+Adapters built on the Chat Completions format share `internal/chatcompletions`, which owns request
+mapping, SSE parsing, tool-name mapping and error classification.
+
+## Live tests
+
+Tests against real APIs are behind the `live` build tag and never run in CI. Put credentials in an
+untracked `.env` file:
+
+```bash
+DEEPSEEK_API_KEY=...
+DEEPSEEK_MODEL=deepseek-flash   # run once without it to list the available models
+```
+
+```bash
+make live
+```

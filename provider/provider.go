@@ -32,6 +32,8 @@ type Capabilities struct {
 	Tools bool
 	// ParallelToolCalls reports whether the model may return several tool calls in one turn.
 	ParallelToolCalls bool
+	// ForcedToolChoice reports support for ToolChoiceRequired and ToolChoiceTool.
+	ForcedToolChoice bool
 	// Vision reports support for image inputs.
 	Vision bool
 	// Files reports support for document inputs such as PDFs.
@@ -48,6 +50,9 @@ type Capabilities struct {
 func (c Capabilities) Supports(req Request) error {
 	if len(req.Tools) > 0 && !c.Tools {
 		return unsupported("tools")
+	}
+	if (req.ToolChoice.Mode == ToolChoiceRequired || req.ToolChoice.Mode == ToolChoiceTool) && !c.ForcedToolChoice {
+		return unsupported("forcing a tool choice")
 	}
 	for _, msg := range req.Messages {
 		for _, part := range msg.Parts {

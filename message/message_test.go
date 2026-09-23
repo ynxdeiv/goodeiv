@@ -39,6 +39,7 @@ func TestConstructors(t *testing.T) {
 
 func TestTextJoinsOnlyTextParts(t *testing.T) {
 	msg := message.New(message.RoleAssistant,
+		message.Reasoning{Text: "hidden thoughts "},
 		message.Text{Text: "Checking "},
 		message.ToolCall{ID: "c1", Name: "weather.current", Arguments: json.RawMessage(`{}`)},
 		message.Text{Text: "now."},
@@ -68,6 +69,17 @@ func TestToolCallsAndResults(t *testing.T) {
 	}
 }
 
+func TestReasoningJoinsReasoningParts(t *testing.T) {
+	msg := message.New(message.RoleAssistant,
+		message.Reasoning{Text: "first, "},
+		message.Text{Text: "answer"},
+		message.Reasoning{Text: "then"},
+	)
+	if got, want := msg.Reasoning(), "first, then"; got != want {
+		t.Fatalf("Reasoning() = %q, want %q", got, want)
+	}
+}
+
 func TestToolResultsAreUntrustedByDefault(t *testing.T) {
 	var result message.ToolResult
 	if result.Trust != message.Untrusted {
@@ -89,6 +101,9 @@ func TestValidate(t *testing.T) {
 		{"assistant tool call", message.New(message.RoleAssistant, validCall), false},
 		{"assistant tool call without arguments", message.New(message.RoleAssistant, message.ToolCall{ID: "c1", Name: "x"}), false},
 		{"tool result", message.Tool(message.ToolResult{CallID: "c1", Text: "ok"}), false},
+		{"assistant reasoning", message.New(message.RoleAssistant, message.Reasoning{Text: "thinking"}, validCall), false},
+		{"user reasoning", message.New(message.RoleUser, message.Reasoning{Text: "x"}), true},
+		{"empty reasoning", message.New(message.RoleAssistant, message.Reasoning{}), true},
 
 		{"unknown role", message.New(message.Role("robot"), message.Text{Text: "x"}), true},
 		{"no parts", message.New(message.RoleUser), true},
@@ -131,6 +146,7 @@ func TestJSONRoundTrip(t *testing.T) {
 			message.File{MediaType: "application/pdf", Name: "a.pdf", URL: "https://x/a.pdf"},
 		),
 		message.New(message.RoleAssistant,
+			message.Reasoning{Text: "the user wants the weather"},
 			message.Text{Text: "checking"},
 			message.ToolCall{ID: "c1", Name: "weather.current", Arguments: json.RawMessage(`{"city":"Lisbon"}`)},
 		),

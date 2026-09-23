@@ -64,10 +64,17 @@ func Tool(results ...ToolResult) Message {
 // Text returns the concatenation of every Text part, ignoring other part types.
 func (m Message) Text() string {
 	var b strings.Builder
-	for _, part := range m.Parts {
-		if text, ok := part.(Text); ok {
-			b.WriteString(text.Text)
-		}
+	for _, text := range partsOf[Text](m.Parts) {
+		b.WriteString(text.Text)
+	}
+	return b.String()
+}
+
+// Reasoning returns the concatenation of every Reasoning part.
+func (m Message) Reasoning() string {
+	var b strings.Builder
+	for _, reasoning := range partsOf[Reasoning](m.Parts) {
+		b.WriteString(reasoning.Text)
 	}
 	return b.String()
 }

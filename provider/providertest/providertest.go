@@ -66,6 +66,7 @@ func New(turns ...Turn) *Provider {
 		capabilities: provider.Capabilities{
 			Tools:             true,
 			ParallelToolCalls: true,
+			ForcedToolChoice:  true,
 			Vision:            true,
 			Files:             true,
 			StructuredOutput:  true,
