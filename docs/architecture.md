@@ -14,7 +14,7 @@
          provider       tool        approval        policy
             │            │          reference        event
             └────────────┴─────┬───────┴──────────────┘
-                           primitives   message, model, usage, errors
+                           primitives   message, usage, fault
 ```
 
 Lower-level packages never import higher-level ones. Cycles are solved by redrawing the
@@ -28,6 +28,16 @@ boundary, never with a catch-all package.
 | `github.com/ynxdeiv/goodeiv/integrations/<name>` | tools for one integration | core + that integration's SDK |
 
 See [ADR 0001](adr/0001-module-boundaries.md).
+
+## Primitives
+
+| Package | Contents |
+|---|---|
+| `fault` | Error taxonomy (`Kind`, `*Error`, `KindOf`, `IsRetryable`, `RetryAfter`) — see [errors.md](errors.md) |
+| `message` | `Role`, `Message` and the closed set of parts: `Text`, `Image`, `File`, `ToolCall`, `ToolResult`; `Trust` marker; validation and JSON |
+| `usage` | `Count` (known vs. unreported) and `Usage` with aggregation |
+
+`message` depends on `fault`; `usage` and `fault` depend only on the standard library.
 
 ## Core contracts (detailed per phase)
 

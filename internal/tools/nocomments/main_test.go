@@ -120,3 +120,48 @@ func New() {}
 		})
 	}
 }
+
+func TestInspectExampleOutput(t *testing.T) {
+	src := `package x_test
+
+func ExampleNew() {
+	println("a")
+	// Output:
+	// a
+}
+
+func ExampleNew_unordered() {
+	// Unordered output:
+	// a
+}
+
+func helper() {
+	// Output:
+	// a
+}
+
+func ExampleOther() {
+	// explain
+	println("b")
+}
+`
+	tests := []struct {
+		name       string
+		path       string
+		violations int
+	}{
+		{"test file allows output blocks only in examples", "x_test.go", 3},
+		{"non-test file allows no output blocks", "x.go", 7},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := inspect(tt.path, src)
+			if err != nil {
+				t.Fatalf("inspect: %v", err)
+			}
+			if len(got) != tt.violations {
+				t.Fatalf("got %d violations, want %d: %v", len(got), tt.violations, got)
+			}
+		})
+	}
+}

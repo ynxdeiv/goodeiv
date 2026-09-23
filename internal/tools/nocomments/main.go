@@ -90,6 +90,9 @@ func inspect(path string, src any) ([]string, error) {
 	}
 
 	docs := exportedDocs(file)
+	if strings.HasSuffix(path, "_test.go") {
+		allowExampleOutputs(file, docs)
+	}
 
 	var violations []string
 	for _, group := range file.Comments {
@@ -148,6 +151,24 @@ func exportedDocs(file *ast.File) map[*ast.CommentGroup]bool {
 		}
 	}
 	return docs
+}
+
+func allowExampleOutputs(file *ast.File, docs map[*ast.CommentGroup]bool) {
+	for _, decl := range file.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Recv != nil || fn.Body == nil || !strings.HasPrefix(fn.Name.Name, "Example") {
+			continue
+		}
+		for _, group := range file.Comments {
+			if group.Pos() < fn.Body.Lbrace || group.End() > fn.Body.Rbrace {
+				continue
+			}
+			first := strings.TrimSpace(strings.TrimPrefix(group.List[0].Text, "//"))
+			if first == "Output:" || first == "Unordered output:" {
+				docs[group] = true
+			}
+		}
+	}
 }
 
 func isExportedFunc(fn *ast.FuncDecl) bool {
