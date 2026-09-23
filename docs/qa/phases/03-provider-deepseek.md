@@ -46,7 +46,7 @@ error codes):
 - Text + reasoning + usage (including cache-hit and reasoning tokens), keep-alive lines, auth header, `stream_options`.
 - Parallel tool calls with arguments fragmented across chunks and interleaved indexes; dotted names round-trip.
 - Exact normalized event sequence for a streamed tool call.
-- Exact request body: system/user/assistant/tool mapping, reasoning echo, multiple tool results expanded, tool name mapping, schema, named tool choice, max tokens, temperature.
+- Exact request body: system/user/assistant/tool mapping, reasoning echo, multiple tool results expanded, tool name mapping, schema, `none` tool choice, max tokens, temperature. Forced tool choices rejected with zero HTTP calls.
 - Reasoning echo on tool-call turns without prior reasoning; error tool results flagged to the model; empty schemas filled in.
 - Tool-name collisions, invalid requests and unsupported image inputs rejected with zero HTTP calls.
 - Eleven HTTP error cases classified, with `Retry-After` and no leak of vendor text or keys.
