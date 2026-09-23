@@ -6,3 +6,4 @@
 | [0002](0002-doc-comments-policy.md) | Comments only as doc comments on exported API | Accepted |
 | [0003](0003-agent-agnostic-tooling.md) | Tool-agnostic coding-agent configuration | Accepted |
 | [0004](0004-error-model.md) | Error model: one taxonomy, kinds as `errors.Is` targets, causes never printed | Accepted |
+| [0005](0005-provider-contract.md) | Provider contract with `iter.Seq2` streaming and `Collect` | Accepted |

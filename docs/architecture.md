@@ -39,6 +39,12 @@ See [ADR 0001](adr/0001-module-boundaries.md).
 
 `message` depends on `fault`; `usage` and `fault` depend only on the standard library.
 
+## Providers
+
+`provider` holds the contract, `Request`/`Response`, stream events, `Collect` and the `Registry`;
+`provider/providertest` holds the scripted fake. Vendor adapters live in `provider/<name>`.
+See [providers.md](providers.md).
+
 ## Core contracts (detailed per phase)
 
 | Concept | Responsibility |

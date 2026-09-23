@@ -212,7 +212,8 @@ Read more in [docs/architecture.md](docs/architecture.md) and the [ADRs](docs/ad
 |---|---|
 | Repository foundation, tooling, CI | ✅ done |
 | Core types and error taxonomy | ✅ done |
-| Provider contract + OpenAI adapter | ⏳ next |
+| Provider contract + fake provider | ✅ done |
+| OpenAI adapter | ⏳ next |
 | Tools, registry and agent loop | 🗓 planned |
 | Retry and fallback | 🗓 planned |
 | References, HITL and policies | 🗓 planned |
