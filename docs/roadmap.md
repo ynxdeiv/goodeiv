@@ -12,7 +12,7 @@ The order may change; record the reason here when it does.
 |---|---|---|---|
 | 00 | `00-foundation` | Repository layout, tooling, gates, docs | done |
 | 01 | `01-core-types` | `message` (roles, typed parts, trust), `usage`, `fault` error taxonomy | done |
-| 02 | `02-provider-contract` | provider contract, request/response, finish reason, stream events, capabilities, registry, scripted fake provider | pending |
+| 02 | `02-provider-contract` | provider contract, request/response, finish reason, stream events, capabilities, registry, scripted fake provider | done |
 | 03 | `03-provider-openai` | first real adapter (generate + stream) | pending |
 | 04 | `04-tool-contract` | tool, definition, result, risk, registry, fake tools | pending |
 | 05 | `05-runtime-loop` | bounded loop, execution context, cancellation, timeouts | pending |
